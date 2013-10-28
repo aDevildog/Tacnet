@@ -3,3 +3,6 @@ gunicorn
 newrelic
 django-debug-toolbar
 south
+djangorestframework
+markdown
+django-filter
