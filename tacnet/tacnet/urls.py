@@ -24,7 +24,8 @@ urlpatterns = patterns('',
     #(r'^$', 'errors.views.underdevelopment'),
 
     (r'^frontpage/', include('frontpage.urls')),
-    (r'^tacsketch/', include('tacsketch.urls'))
+    (r'^tacsketch/', include('tacsketch.urls')),
+    (r'^api/', include('api.urls'))
 
 )
 urlpatterns += staticfiles_urlpatterns()

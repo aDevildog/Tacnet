@@ -132,14 +132,20 @@ INSTALLED_APPS = (
     'frontpage',
     'base',
     'gunicorn',
-    'tacsketch'
+    'tacsketch',
     'rest_framework',
+    'api',
 
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdminUser',),
+    'PAGINATE_BY': 10
+}
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
