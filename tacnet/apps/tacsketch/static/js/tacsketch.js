@@ -17,8 +17,13 @@ context.lineWidth = 1;
 context.lineJoin = 'round';
 context.lineCap = 'round';
 context.strokeStyle = '#000';
-
+var oldFillStyle;
 // Increase and decrease brush size
+function eraser() {
+    oldFillStyle = context.fillStyle;
+    context.fillStyle = 'rgba(255,0,0,0)';
+}
+
 function increaseBrush() {
     context.lineWidth+=1;
     console.log(context.lineWidth)
