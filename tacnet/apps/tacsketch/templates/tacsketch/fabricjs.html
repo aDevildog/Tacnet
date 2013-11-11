@@ -1,0 +1,45 @@
+{% extends 'base/base.html' %}
+
+{% block header %}
+
+    <!--Loading layer-->
+    <div id="loading_layer"></div>
+    <script src="/static/js/spin.js"></script>
+    <link rel="stylesheet" href="/static/js/loading_layer/loading.css">
+    <script type="text/javascript" src="/static/js/loading_layer/loading.js"></script>
+
+
+{% endblock %}
+
+{% block nav %}
+
+{% endblock %}
+
+{% block container %}
+
+    <canvas id="c" width="500" height="500" style="border:1px solid #aaa"></canvas>
+
+    <div style="display: inline-block; margin-left: 10px">
+      <button id="drawing-mode" class="btn btn-info">Cancel drawing mode</button><br>
+      <button id="clear-canvas" class="btn btn-info">Clear</button><br>
+    <button id="create-image" class="btn btn-info">create image</button><br>
+    </div>
+
+
+    <!-- scripts -->
+    <script src="/static/js/TogetherJSConfig.js"></script>
+    <script src="https://togetherjs.com/togetherjs-min.js"></script>
+
+    <script src="/static/js/fabricjs.js"></script>
+
+    <link rel="stylesheet" href="/static/css/dock.css">
+
+    <!--Close loading layer-->
+    <script type="text/javascript" src="/static/js/loading_layer/closeLoading.js"></script>
+
+
+
+
+{% endblock %}
+
+
