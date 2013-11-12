@@ -13,57 +13,13 @@
 
 {% block nav %}
 
-    <li id="chooseMap" data-original-title="Select Map"><a href="#"><span class="glyphicon glyphicon-tower"></span> Select Map</a></li>
-     <div id="chooseMap_content_wrapper" style="display: none">
-
-        <p><select id="gameslist" style="width: 100%;">
-         <option></option>
-            {% for game in games %}
-                <option value="opt-{{ game.name|slugify }}">{{ game.name }}</option>
-            {% endfor %}
-        </select></p>
-
-
-        <p><select id="mapslist" style="width: 100%;">
-            <option></option>
-        </select></p>
-
-        <p class="text-right"><span class="glyphicon glyphicon-tower"></span> <a href="#" class="moreMaps">Suggest a map</a></p>
-
-     </div>
-
-    <li id="chooseBrush"  data-original-title="Select Brush"><a href="#"><span class="glyphicon glyphicon-pencil"></span> Select Brush</a></li>
-     <div id="chooseBrush_content_wrapper" style="display: none">
-
-         <div class="form-group" id="brushSizeForm">
-            <label for="brushSize">Brush Size</label>
-            <!--Slider comes here.-->
-          </div>
-
-
-        <div class="btn-group btn-group-justified" style="width: 360px;">
-            <a class="btn btn-success green-pick">Green</a>
-            <a class="btn btn-warning yellow-pick">Yellow</a>
-            <a class="btn btn-danger red-pick">Red</a>
-            <a class="btn btn-info blue-pick">Blue</a>
-            <a class="btn btn-inverse black-pick">Black</a>
-            <a class="btn btn-default eraser">
-                <i class="fa fa-eraser"></i>
-            </a>
-        </div>
-
-     </div>
-
-    <li class="clearCanvas"><a href="#"><span class="glyphicon glyphicon-minus"></span> Clear</a></li>
-    <li class="resetCanvas"><a href="#"><span class="glyphicon glyphicon-remove-sign"></span> Reset Map</a></li>
-    <li class="saveDrawings"><a href="#"><span class="glyphicon glyphicon-floppy-save"></span> Save</a></li>
-    <li><a href="javascript:onLoadClick();"><span class="glyphicon glyphicon-floppy-open"></span> Load</a></li>
-    <input type="file" id="input" style="visibility:hidden;position:absolute;top:-50;left:-50">
 
 
 {% endblock %}
 
 {% block container %}
+
+
     <div class="container">
 
                 <canvas id="background" style="z-index: -1 !important;"></canvas>
@@ -136,11 +92,90 @@
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
+
+    <!-- Sidebar menu -->
+    <div class="pull-sidebar" style="display: none;">
+    <input type="file" id="input" style="visibility:hidden;position:absolute;top:-50;left:-50">
+    <ul class="shadow">
+        <li class="tjs">
+        </li>
+        <li class="selectmap"><span class="glyphicon glyphicon-tower"></span></li>
+        <li class="selectbrush"><span class="glyphicon glyphicon-pencil"></span></li>
+        <li class="clearCanvas"><span class="glyphicon glyphicon-minus"></span></li>
+        <li class="resetCanvas"><span class="glyphicon glyphicon-remove-sign"></span></li>
+        <li class="saveDrawings"><span class="glyphicon glyphicon-floppy-save"></span></li>
+        <li class="loadImage"><span class="glyphicon glyphicon-floppy-open"></span></li>
+    </ul>
+
+    <div class="list-content">
+
+    </div>
+
+    <div class="list-content-holders">
+
+        <div class="selectmap">
+            <h3 class="content-header"><span class="glyphicon glyphicon-tower"></span> Select Map</h3>
+            <div class="inner">
+
+                 <p><select id="gameslist" style="width: 100%;">
+                         <option></option>
+                            {% for game in games %}
+                                <option value="opt-{{ game.name|slugify }}">{{ game.name }}</option>
+                            {% endfor %}
+                        </select></p>
+
+
+                        <p><select id="mapslist" style="width: 100%;">
+                            <option></option>
+                        </select></p>
+
+                        <p class="text-right"><span class="glyphicon glyphicon-tower"></span> <a href="#" class="moreMaps">Suggest a map</a></p>
+
+            </div>
+        </div>
+        <div class="selectbrush">
+            <h3 class="content-header"><span class="glyphicon glyphicon-pencil"></span> Select Brush</h3>
+            <div class="inner">
+
+                <div class="form-group" id="brushSizeForm">
+                            <label for="brushSize">Brush Size</label>
+                            <!--Slider comes here.-->
+                          </div>
+
+
+                        <div class="btn-group btn-group-justified">
+                            <a class="btn btn-success green-pick">Green</a>
+                            <a class="btn btn-warning yellow-pick">Yellow</a>
+                            <a class="btn btn-danger red-pick">Red</a>
+                            <a class="btn btn-info blue-pick">Blue</a>
+                        </div>
+
+                        <div class="btn-group btn-group-justified">
+
+                            <a class="btn btn-inverse black-pick">Black</a>
+                            <a class="btn btn-default eraser">
+                                <i class="fa fa-eraser"></i>
+                            </a>
+                        </div>
+
+            </div>
+        </div>
+
+        <div class="tjs">
+            <h3 class="content-header username"><span class="glyphicon glyphicon-user"></span> </h3>
+            <div class="inner">
+                <label for="roomurl">Room URL</label>
+                <input class="roomurl" type="text" class="input-block-level" style="width: 272px; color: #FFF !important;" />
+            </div>
+        </div>
+
+    </div>
+
+    </div>
+
     <!-- scripts -->
     <script src="/static/js/TogetherJSConfig.js"></script>
     <script src="https://togetherjs.com/togetherjs-min.js"></script>
-
-    <script src="/static/js/fabricjs.js"></script>
 
     <script src="/static/js/tacsketch.js"></script>
     <link rel="stylesheet" href="/static/css/dock.css">

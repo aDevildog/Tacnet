@@ -176,10 +176,6 @@ function saveDrawings() {
     window.location.href=image;
 }
 
-function onLoadClick() {
-    $("#input").click();
-}
-
 var input = document.getElementById('input');
 input.addEventListener('change', handleFiles);
 
@@ -274,132 +270,6 @@ TogetherJS.hub.on("load", function(msg) {
 
 $(document).ready(function () {
 
-    // Hide popover
-    function hidePopover(element) {
-        if (element.next('div.popover:visible').length) {
-            element.popover('toggle');
-        }
-    };
-
-    // Initialize popovers
-    $('#chooseMap').popover({
-        html: true,
-        placement: 'bottom',
-        content: function () {
-            return $('#chooseMap_content_wrapper').html();
-        }
-    });
-
-    $('#chooseBrush').popover({
-        html: true,
-        placement: 'bottom',
-        content: function () {
-            return $('#chooseBrush_content_wrapper').html();
-        }
-    });
-
-    // Show popovers
-    $('#chooseMap').on('shown.bs.popover', function () {
-
-        $("#gameslist").select2({
-            placeholder: "Select Game"
-        }).on("change", function (e) {
-            var mapsList = $('#mapslist');
-            mapsList.html($('#' + e.val).html());
-        });
-
-
-        $("#mapslist").select2({
-            placeholder: "Select Map"
-        }).on("change", function (e) {
-            backgroundClicked(e.val);
-            hidePopover($("#chooseMap"));
-        });
-
-        hidePopover($("#chooseBrush"));
-
-        // More maps
-        $('.moreMaps').click(function(){
-            hidePopover($("#chooseMap"));
-            $('#moreMapsModal').modal('toggle', {
-              keyboard: false
-            });
-        });
-
-    });
-
-    $('#chooseBrush').on('show.bs.popover', function () {
-        hidePopover($("#chooseMap"));
-
-    });
-
-    $('#chooseBrush').on('shown.bs.popover', function () {
-        $('#brushSizeForm').append('<input type="text" class="slider" id="brushSize" style="width: 360px;" />');
-        $('.slider').slider({
-            min: 2,
-            max: 50,
-            step: 1,
-            value: context.lineWidth
-        }).on('slide', function (ev) {
-            setSize(ev.value);
-        }).on('slideStop', function (ev) {
-            hidePopover($("#chooseBrush"));
-            ChangeMouse();
-        });
-
-        // Button listeners
-
-        //Color change functions
-        $('.green-pick').click(function () {
-            setColor('#00ff00');
-            hidePopover($("#chooseBrush"));
-            ChangeMouse();
-        });
-
-        //Color change functions
-        $('.yellow-pick').click(function () {
-            setColor('#ff0');
-            hidePopover($("#chooseBrush"));
-            ChangeMouse();
-        });
-
-        //Color change functions
-        $('.red-pick').click(function () {
-            setColor('#ff0000');
-            hidePopover($("#chooseBrush"));
-            ChangeMouse();
-        });
-
-        //Color change functions
-        $('.blue-pick').click(function () {
-            setColor('#0000ff');
-            hidePopover($("#chooseBrush"));
-            ChangeMouse();
-        });
-
-        //Color change functions
-        $('.black-pick').click(function () {
-            setColor('#000');
-            hidePopover($("#chooseBrush"));
-            ChangeMouse();
-        });
-        $('.eraser').click(function () {
-            eraser();
-            hidePopover($("#chooseBrush"));
-            ChangeMouse();
-        })
-    });
-
-    // Hide popover listeners
-    $('#chooseBrush').on('hide.bs.popover', function () {
-        $('.slider').remove();
-    });
-
-    // Close popovers when clicking on canvas
-    $('#sketch').mousedown(function () {
-        hidePopover($("#chooseMap"));
-        hidePopover($("#chooseBrush"));
-    });
 
     // Listeners
     $('.clearCanvas').click(function(){
@@ -423,6 +293,10 @@ $(document).ready(function () {
             width: 'auto'
         });
     })
+
+    $('.loadImage').click(function(){
+        $("#input").click();
+    });
 
     // Draw Mouse
     function ChangeMouse(){
@@ -464,5 +338,146 @@ $(document).ready(function () {
     };
     // Init mouse
     ChangeMouse();
+
+
+    function cleanUpSidebar(){
+        $('.slider').remove();
+    };
+
+
+        var menuWidth = 300;
+        var ulmenu = $('.pull-sidebar ul');
+        var ulmenuli = $('.pull-sidebar ul li');
+        var sidebar = $('.pull-sidebar');
+        var sidebarContent = $('.pull-sidebar .list-content');
+
+
+        // Hide menu on load
+        hideMenu();
+
+        // Functions
+        function hideMenu() {
+            ulmenu.css("left", "0px");
+            sidebarContent.hide();
+            sidebar.css('display','');
+            cleanUpSidebar();
+        };
+
+        // Events
+        // Toggle sidebar content
+        ulmenuli.mouseenter(function(data){
+            // Open sidebar if tab exist
+            var className = data.currentTarget.className;
+            if (className != ""){
+                var content = $('.pull-sidebar .list-content-holders .' + className);
+                if (content.length != 0) {
+                    // We have data!
+                    sidebarContent.html(content.html());
+                    ulmenu.css("left", menuWidth + "px");
+                    sidebarContent.css('height', ulmenu.css('height'));
+
+                    ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+                    if (className == "selectmap"){
+
+                        $("#gameslist").select2({
+                            placeholder: "Select Game"
+                        }).on("change", function (e) {
+                            var mapsList = $('#mapslist');
+                            mapsList.html($('#' + e.val).html());
+                        });
+
+
+                        $("#mapslist").select2({
+                            placeholder: "Select Map"
+                        }).on("change", function (e) {
+                            backgroundClicked(e.val);
+                        });
+
+                        // More maps
+                        $('.moreMaps').click(function(){
+                            $('#moreMapsModal').modal('toggle', {
+                              keyboard: false
+                            });
+                        });
+
+
+                    }
+                    else if (className == "selectbrush"){
+                            $('#brushSizeForm').append('<br/><input type="text" class="slider" id="brushSize" style="width: 272px;" />');
+                            $('.slider').slider({
+                                min: 2,
+                                max: 50,
+                                step: 1,
+                                value: context.lineWidth
+                            }).on('slide', function (ev) {
+                                setSize(ev.value);
+                            }).on('slideStop', function (ev) {
+                                ChangeMouse();
+                            });
+
+                            // Button listeners
+
+                            //Color change functions
+                            $('.green-pick').click(function () {
+                                setColor('#00ff00');
+                                ChangeMouse();
+                            });
+
+                            //Color change functions
+                            $('.yellow-pick').click(function () {
+                                setColor('#ff0');
+                                ChangeMouse();
+                            });
+
+                            //Color change functions
+                            $('.red-pick').click(function () {
+                                setColor('#ff0000');
+                                ChangeMouse();
+                            });
+
+                            //Color change functions
+                            $('.blue-pick').click(function () {
+                                setColor('#0000ff');
+                                ChangeMouse();
+                            });
+
+                            //Color change functions
+                            $('.black-pick').click(function () {
+                                setColor('#000');
+                                ChangeMouse();
+                            });
+                            $('.eraser').click(function () {
+                                eraser();
+                                ChangeMouse();
+                            })
+                    }
+                    else if (className == "tjs") {
+                        $('.username').html('<span class="glyphicon glyphicon-user"></span> ' + TogetherJS.require("peers").Self.defaultName);
+                        $('.username').css('color', TogetherJS.require("peers").Self.color);
+                        console.log(TogetherJS.require("session"));
+                        $('.roomurl').val(document.URL + '#&togetherjs=' + TogetherJS.require("session").shareId);
+
+                    }
+
+                    ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+                    sidebarContent.show();
+                }
+            }
+        });
+
+        $('#sketch').mouseenter(function(){
+            hideMenu();
+        });
+
+        $('body').mousemove(function(){
+                        $('.tjs').css('background-image', 'url(' + TogetherJS.require("peers").Self.avatar + ')');
+        });
+
+
+
 
 });
