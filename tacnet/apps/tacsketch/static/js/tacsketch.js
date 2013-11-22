@@ -35,8 +35,9 @@ var rect = new fabric.Rect({
     height: 40
 });
 
-var line = new fabric.Line([0, 0, 600, 300], {
-    stroke: 'black'
+var line = new fabric.Line([200, 200, 201, 202], {
+    strokeWidth: 15,
+    stroke: 'red'
 });
 
 
@@ -51,7 +52,7 @@ canvas.on('mouse:up', function(e) {
 
 function move(e) {
     mouse = canvas.getPointer(e.e);
-
+    console.log(mouse);
     canvas.add(draw([lastMouse.x, lastMouse.y, mouse.x, mouse.y], brushColor, brushSize));
     if (TogetherJS.running) {
         TogetherJS.send({
@@ -61,15 +62,18 @@ function move(e) {
             size: brushSize
         });
     }
-    lastMouse = mouse;
+    if ((Math.abs(mouse.x-lastMouse.x) > 1) && (Math.abs(mouse.y-lastMouse.y) > 1)) {
+        lastMouse = mouse;
+    }
 }
-//canvas.add(line);
+canvas.add(line);
 //canvas.add(rect);
 
 TogetherJS.hub.on("draw", function (msg) {
     if (!msg.sameUrl) {
         return;
     }
+    console.log("received draw");
     canvas.add(draw(msg.coords, msg.color, msg.size));
 });
 
