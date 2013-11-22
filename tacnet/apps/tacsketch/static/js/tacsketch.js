@@ -1,5 +1,5 @@
 var canvas = new fabric.Canvas('sketch');
-
+canvas.selection = false;
 
 fabric.Image.fromURL('/static/img/boot.jpg', function(img) {
     console.log(img.width, img.height);
@@ -13,7 +13,19 @@ fabric.Image.fromURL('/static/img/boot.jpg', function(img) {
 
 var brushSize = 1;
 var brushColor = "rgb(0,0,0)"
+var lastMouse = {
+    x: 0,
+    y: 0
+};
 
+function draw(coords, color, size) {
+    return new fabric.Line(coords, {
+        fill: color,
+        stroke: color,
+        strokeWidth: size,
+        selectable: false
+    });
+}
 
 var rect = new fabric.Rect({
     left: 100,
@@ -27,9 +39,40 @@ var line = new fabric.Line([0, 0, 600, 300], {
     stroke: 'black'
 });
 
-canvas.on(
-canvas.add(line),
-canvas.add(rect);
+
+canvas.on('mouse:down', function(e) {
+    lastMouse = canvas.getPointer(e.e);
+    canvas.on('mouse:move', move);
+});
+
+canvas.on('mouse:up', function(e) {
+    canvas.off('mouse:move');
+});
+
+function move(e) {
+    mouse = canvas.getPointer(e.e);
+
+    canvas.add(draw([lastMouse.x, lastMouse.y, mouse.x, mouse.y], brushColor, brushSize));
+    if (TogetherJS.running) {
+        TogetherJS.send({
+            type: "draw",
+            coords: [lastMouse.x, lastMouse.y, mouse.x, mouse.y],
+            color: brushColor,
+            size: brushSize
+        });
+    }
+    lastMouse = mouse;
+}
+//canvas.add(line);
+//canvas.add(rect);
+
+TogetherJS.hub.on("draw", function (msg) {
+    if (!msg.sameUrl) {
+        return;
+    }
+    canvas.add(draw(msg.coords, msg.color, msg.size));
+});
+
 
 
 /*
