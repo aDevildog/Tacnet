@@ -66,7 +66,9 @@
 {% block container %}
     <div class="container">
 
-                <canvas id="background" style="z-index: -1 !important;"></canvas>
+                <!-- <canvas id="background" style="z-index: -1 !important;"></canvas> -->
+
+
                 <canvas id="sketch" style="z-index: 0 !important;"></canvas>
                 <div class="clearfix"></div>
 
@@ -82,7 +84,7 @@
 
             {% for mode in game.modes %}
                 <optgroup label="{{ mode.name }}">
-                    {%  for map in mode.maps %}
+                    {%  for map in mode.maps %}e
                         <option value="/media/{{ map.image }}">{{ map.name }}</option>
                     {% endfor %}
                 </optgroup>
@@ -139,10 +141,9 @@
     <!-- scripts -->
     <script src="/static/js/TogetherJSConfig.js"></script>
     <script src="https://togetherjs.com/togetherjs-min.js"></script>
-
-    <script src="/static/js/fabricjs.js"></script>
-
+    <script src="/static/js/fabric.js"></script>
     <script src="/static/js/tacsketch.js"></script>
+
     <link rel="stylesheet" href="/static/css/dock.css">
 
     <!-- Select2 -->

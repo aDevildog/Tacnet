@@ -1,4 +1,38 @@
+var canvas = new fabric.Canvas('sketch');
 
+
+fabric.Image.fromURL('/static/img/boot.jpg', function(img) {
+    console.log(img.width, img.height);
+    canvas.setWidth(img.width);
+    canvas.setHeight(img.height);
+    canvas.setBackgroundImage('/static/img/boot.jpg', canvas.renderAll.bind(canvas), {
+        originX: 'left',
+        originY: 'top'
+    });
+});
+
+var brushSize = 1;
+var brushColor = "rgb(0,0,0)"
+
+
+var rect = new fabric.Rect({
+    left: 100,
+    top: 100,
+    fill: 'red',
+    width: 40,
+    height: 40
+});
+
+var line = new fabric.Line([0, 0, 600, 300], {
+    stroke: 'black'
+});
+
+canvas.on(
+canvas.add(line),
+canvas.add(rect);
+
+
+/*
 var canvas = document.getElementById ('sketch');
 var context = canvas.getContext('2d');
 
@@ -466,3 +500,4 @@ $(document).ready(function () {
     ChangeMouse();
 
 });
+*/
