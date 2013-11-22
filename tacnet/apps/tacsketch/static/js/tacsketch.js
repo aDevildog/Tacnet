@@ -53,16 +53,16 @@ canvas.on('mouse:up', function(e) {
 function move(e) {
     mouse = canvas.getPointer(e.e);
     console.log(mouse);
-    canvas.add(draw([lastMouse.x, lastMouse.y, mouse.x, mouse.y], brushColor, brushSize));
-    if (TogetherJS.running) {
-        TogetherJS.send({
-            type: "draw",
-            coords: [lastMouse.x, lastMouse.y, mouse.x, mouse.y],
-            color: brushColor,
-            size: brushSize
-        });
-    }
-    if ((Math.abs(mouse.x-lastMouse.x) > 1) && (Math.abs(mouse.y-lastMouse.y) > 1)) {
+    if ((Math.abs(mouse.x-lastMouse.x) > 1) || (Math.abs(mouse.y-lastMouse.y) > 1)) {
+        canvas.add(draw([lastMouse.x, lastMouse.y, mouse.x, mouse.y], brushColor, brushSize));
+        if (TogetherJS.running) {
+            TogetherJS.send({
+                type: "draw",
+                coords: [lastMouse.x, lastMouse.y, mouse.x, mouse.y],
+                color: brushColor,
+                size: brushSize
+            });
+        }
         lastMouse = mouse;
     }
 }
