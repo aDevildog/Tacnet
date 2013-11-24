@@ -11,7 +11,8 @@ fabric.Image.fromURL('/static/img/boot.jpg', function(img) {
     });
 });
 
-var brushSize = 1;
+var icons = new Object();
+var brushSize = 3;
 var brushColor = "rgb(0,0,0)"
 var lastMouse = {
     x: 0,
@@ -28,7 +29,6 @@ function draw(coords, color, size) {
 }
 
 var rect = new fabric.Rect({
-    hash: "supscrub",
     left: 100,
     top: 100,
     fill: 'red',
@@ -59,15 +59,15 @@ var object = {
 
 canvas.on('mouse:down', function(e) {
     lastMouse = canvas.getPointer(e.e);
-    canvas.on('mouse:move', drawMove);
+    canvas.on('mouse:move', draw_move);
 });
 
 canvas.on('mouse:up', function(e) {
     canvas.off('mouse:move');
 });
 
-function drawMove(e) {
-    mouse = canvas.getPointer(e.e);
+function draw_move(e) {
+    var mouse = canvas.getPointer(e.e);
     if ((Math.abs(mouse.x-lastMouse.x) > 1) || (Math.abs(mouse.y-lastMouse.y) > 1)) {
         canvas.add(draw([lastMouse.x, lastMouse.y, mouse.x, mouse.y], brushColor, brushSize));
         if (TogetherJS.running) {
@@ -82,55 +82,96 @@ function drawMove(e) {
     }
 }
 
-var randomname = "abcdefgh"
+function add_icon(icon, hash) {
+    var oHash = hash;
+    fabric.Image.fromURL(icon, function(img) {
+        if (!hash) {
+            console.log("hash false");
+            hash = Math.random().toString(36);
+        }
+        var oImg = img.set({
+            hash: hash,
+            left: 100,
+            top: 100
+        }).scale(0.5);
+        canvas.add(oImg).renderAll();
+        canvas.setActiveObject(oImg);
+        icons[hash] = oImg;
+        if (TogetherJS.running && !oHash) {
+            TogetherJS.send({
+                type: "newIcon",
+                hash: hash,
+                url: icon
+            });
+        }
+    });
+}
+TogetherJS.hub.on("newIcon", function(msg) {
+    if (!msg.sameUrl) {
+        return;
+    }
+    add_icon(msg.url, msg.hash);
+});
+
+var randomname = "abcdefgh";
 rect.hash = randomname;
-var rects = new Object();
-rects[randomname] = rect;
+icons[randomname] = rect;
 
-canvas.on('object:moving', function(e) {
-    console.log(rect);
-
-    console.log(e.target);
-    console.log(e.target.hash)
+canvas.on('object:rotating', function(e) {
     var sendObject = new Object();
     sendObject['hash'] = e.target.hash;
-    sendObject['fill'] = e.target.fill;
-    sendObject['width'] = e.target.width;
-    sendObject['height'] = e.target.height;
-    sendObject['scaleX'] = e.target.scaleX;
-    sendObject['scaleY'] = e.target.scaleY;
-    sendObject['left'] = e.target.left;
-    sendObject['top'] = e.target.top;
-    sendObject['oCoords'] = e.target.oCoords;
-    //console.log(sendObject['oCoords']);
+    sendObject['angle'] = e.target.angle;
     if (TogetherJS.running) {
         TogetherJS.send({
-            type: "sendTest",
+            type: "sendObject",
             sendObject: sendObject
         });
     }
 });
 
-TogetherJS.hub.on("sendTest", function(msg) {
-   if (!msg.sameUrl) {
-       return;
-   }
-   console.log(msg.sendObject);
-   var object = msg.sendObject;
-   console.log(rects[object.hash]);
-   var newObject = rects[object.hash];
-   console.log(rects);
-   console.log(rects[object.hash].fill);
-   console.log(rects[object.hash]['fill']);
-   console.log("start for");
-   console.log(rects[object.hash]['oCoords']);
-   console.log(object['oCoords']);
-   for (var key in object) {
-       console.log(key, object[key]);
-       rects[object.hash][key] = object[key];
-   }
-   rects[object.hash].setCoords();
-   console.log(rects[object.hash]['oCoords']);
+canvas.on('object:scaling', function(e) {
+    var sendObject = new Object();
+    sendObject['hash'] = e.target.hash;
+    sendObject['scaleX'] = e.target.scaleX;
+    sendObject['scaleY'] = e.target.scaleY;
+    sendObject['width'] = e.target.width;
+    sendObject['height'] = e.target.height;
+    sendObject['left'] = e.target.left;
+    sendObject['top'] = e.target.top;
+    sendObject['oCoords'] = e.target.oCoords;
+    if (TogetherJS.running) {
+        TogetherJS.send({
+            type: "sendObject",
+            sendObject: sendObject
+        });
+    }
+});
+
+canvas.on('object:moving', function(e) {
+    var sendObject = new Object();
+    sendObject['hash'] = e.target.hash;
+    sendObject['left'] = e.target.left;
+    sendObject['top'] = e.target.top;
+    sendObject['oCoords'] = e.target.oCoords;
+    if (TogetherJS.running) {
+        TogetherJS.send({
+            type: "sendObject",
+            sendObject: sendObject
+        });
+    }
+});
+
+
+TogetherJS.hub.on("sendObject", function(msg) {
+    if (!msg.sameUrl) {
+        return;
+    }
+    var sendObject = msg.sendObject;
+    var changeObject = icons[sendObject.hash];
+    for (var key in sendObject) {
+        icons[changeObject.hash][key] = sendObject[key];
+    }
+    icons[sendObject.hash].setCoords();
 });
 canvas.add(line);
 canvas.add(rect);
@@ -143,6 +184,9 @@ TogetherJS.hub.on("draw", function (msg) {
     canvas.add(draw(msg.coords, msg.color, msg.size));
 });
 
+$('.addIcon').click(function(){
+    add_icon('/static/img/grenade.png', false);
+});
 
 
 /*
