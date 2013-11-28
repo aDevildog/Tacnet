@@ -21,14 +21,16 @@ var lastMouse = {
     y: 0
 };
 
-function draw(coords, color, size, pos, circle) {
+function draw(coords, color, size) {
     var path = 'M ' + coords[0] + ' ' + coords[1] + ' L ' + coords[2] + ' ' + coords[3] + ' z';
+    var pos = coords[0] + ' ' + coords[1] + ' ' + coords[2] + ' ' + coords[3];
+    console.log(pos);
     lines[pos] = new fabric.Path(path, {
+        pos: pos,
         stroke: color,
         strokeWidth: size,
         selectable: false
     });
-
     return lines[pos];
 }
 
@@ -75,14 +77,8 @@ canvas.on('mouse:up', function(e) {
 
 function draw_move(e) {
     var mouse = canvas.getPointer(e.e);
-    var pos = String(mouse.x) + " " + String(mouse.y);
     if (!erasing) {
-        if ((Math.abs(mouse.x-lastMouse.x) > 1) || (Math.abs(mouse.y-lastMouse.y) > 1)) {
-            canvas.add(draw([lastMouse.x, lastMouse.y, mouse.x, mouse.y], brushColor, brushSize, pos, false));
-        }
-        else {
-            canvas.add(draw([lastMouse.x, lastMouse.y, mouse.x, mouse.y], brushColor, brushSize, pos, true));
-        }
+        canvas.add(draw([lastMouse.x, lastMouse.y, mouse.x, mouse.y], brushColor, brushSize));
         if (TogetherJS.running) {
             TogetherJS.send({
                 type: "draw",
@@ -94,14 +90,18 @@ function draw_move(e) {
         lastMouse = mouse;
     }
     else if (erasing) {
-        var pos = pos.split(" ");
-        var posx  = parseInt(pos[0], 10);
-        var posy = parseInt(pos[1], 10);
-        for (var ix=(posx-(brushSize)); ix<=(posx+(brushSize)); ix++) {
-            for (var iy=(posy-(brushSize)); iy<=(posy+(brushSize)); iy++) {
-                if (lines[ix+" "+iy]) {
-                    canvas.remove(lines[ix+" "+iy]);
-                    delete lines[ix+" "+iy];
+        for (var line in lines) {
+            var posList = lines[line].pos.split(' ');
+            fromX = Number(posList[0]);
+            fromY = Number(posList[1]);
+            toX = Number(posList[2]);
+            toY = Number(posList[3]);
+            slope = (toY-fromY)/(toX-fromX);
+            for (var x=fromX; x<=toX; x++) {
+                y = fromY + ((x-fromX)*slope);
+                if ((mouse.x-brushSize <= x <= mouse.x+brushSize) && (mouse.y-brushSize <= y <= mouse.y+brushSize)) {
+                    canvas.remove(lines[line]);
+                    delete lines[line];
                 }
             }
         }
