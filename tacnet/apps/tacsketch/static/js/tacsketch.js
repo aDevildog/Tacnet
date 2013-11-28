@@ -22,23 +22,13 @@ var lastMouse = {
 };
 
 function draw(coords, color, size, pos, circle) {
-    if (circle) {
-        lines[pos] = new fabric.Circle({
-                radius: size/2,
-                fill: color,
-                left: coords[0],
-                top: coords[1],
-                selectable: false
-        });
-    }
-    else if (!circle) {
-        lines[pos] = new fabric.Line(coords, {
-            stroke: color,
-            strokeWidth: size,
-            selectable: false
-        });
-    }
-    console.log(lines);
+    var path = 'M ' + coords[0] + ' ' + coords[1] + ' L ' + coords[2] + ' ' + coords[3] + ' z';
+    lines[pos] = new fabric.Path(path, {
+        stroke: color,
+        strokeWidth: size,
+        selectable: false
+    });
+
     return lines[pos];
 }
 
@@ -122,7 +112,6 @@ function add_icon(icon, hash) {
     var oHash = hash;
     fabric.Image.fromURL(icon, function(img) {
         if (!hash) {
-            console.log("hash false");
             hash = Math.random().toString(36);
         }
         var oImg = img.set({
@@ -231,6 +220,7 @@ $('.eraserIcon').click(function(){
     else {
         erasing = true;
     }
+    console.log(erasing);
 });
 
 
