@@ -11,7 +11,9 @@ fabric.Image.fromURL('/static/img/boot.jpg', function(img) {
     });
 });
 
+var erasing = false;
 var icons = new Object();
+var lines = new Object();
 var brushSize = 3;
 var brushColor = "rgb(0,0,0)"
 var lastMouse = {
@@ -19,13 +21,25 @@ var lastMouse = {
     y: 0
 };
 
-function draw(coords, color, size) {
-    return new fabric.Line(coords, {
-        fill: color,
-        stroke: color,
-        strokeWidth: size,
-        selectable: false
-    });
+function draw(coords, color, size, pos, circle) {
+    if (circle) {
+        lines[pos] = new fabric.Circle({
+                radius: size/2,
+                fill: color,
+                left: coords[0],
+                top: coords[1],
+                selectable: false
+        });
+    }
+    else if (!circle) {
+        lines[pos] = new fabric.Line(coords, {
+            stroke: color,
+            strokeWidth: size,
+            selectable: false
+        });
+    }
+    console.log(lines);
+    return lines[pos];
 }
 
 var rect = new fabric.Rect({
@@ -59,8 +73,11 @@ var object = {
 
 canvas.on('mouse:down', function(e) {
     lastMouse = canvas.getPointer(e.e);
-    canvas.on('mouse:move', draw_move);
+    if (canvas.getActiveObject() === null) {
+        canvas.on('mouse:move', draw_move);
+    }
 });
+
 
 canvas.on('mouse:up', function(e) {
     canvas.off('mouse:move');
@@ -68,8 +85,14 @@ canvas.on('mouse:up', function(e) {
 
 function draw_move(e) {
     var mouse = canvas.getPointer(e.e);
-    if ((Math.abs(mouse.x-lastMouse.x) > 1) || (Math.abs(mouse.y-lastMouse.y) > 1)) {
-        canvas.add(draw([lastMouse.x, lastMouse.y, mouse.x, mouse.y], brushColor, brushSize));
+    var pos = String(mouse.x) + " " + String(mouse.y);
+    if (!erasing) {
+        if ((Math.abs(mouse.x-lastMouse.x) > 1) || (Math.abs(mouse.y-lastMouse.y) > 1)) {
+            canvas.add(draw([lastMouse.x, lastMouse.y, mouse.x, mouse.y], brushColor, brushSize, pos, false));
+        }
+        else {
+            canvas.add(draw([lastMouse.x, lastMouse.y, mouse.x, mouse.y], brushColor, brushSize, pos, true));
+        }
         if (TogetherJS.running) {
             TogetherJS.send({
                 type: "draw",
@@ -79,6 +102,19 @@ function draw_move(e) {
             });
         }
         lastMouse = mouse;
+    }
+    else if (erasing) {
+        var pos = pos.split(" ");
+        var posx  = parseInt(pos[0], 10);
+        var posy = parseInt(pos[1], 10);
+        for (var ix=(posx-(brushSize)); ix<=(posx+(brushSize)); ix++) {
+            for (var iy=(posy-(brushSize)); iy<=(posy+(brushSize)); iy++) {
+                if (lines[ix+" "+iy]) {
+                    canvas.remove(lines[ix+" "+iy]);
+                    delete lines[ix+" "+iy];
+                }
+            }
+        }
     }
 }
 
@@ -186,6 +222,15 @@ TogetherJS.hub.on("draw", function (msg) {
 
 $('.addIcon').click(function(){
     add_icon('/static/img/grenade.png', false);
+});
+
+$('.eraserIcon').click(function(){
+    if (erasing) {
+        erasing = false;
+    }
+    else {
+        erasing = true;
+    }
 });
 
 
