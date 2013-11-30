@@ -14,7 +14,7 @@ fabric.Image.fromURL('/static/img/boot.jpg', function(img) {
 var erasing = false;
 var icons = new Object();
 var lines = new Object();
-var brushSize = 3;
+var brushSize = 50;
 var brushColor = "rgb(0,0,0)"
 var lastMouse = {
     x: 0,
@@ -24,11 +24,12 @@ var lastMouse = {
 function draw(coords, color, size) {
     var path = 'M ' + coords[0] + ' ' + coords[1] + ' L ' + coords[2] + ' ' + coords[3] + ' z';
     var pos = coords[0] + ' ' + coords[1] + ' ' + coords[2] + ' ' + coords[3];
-    console.log(pos);
     lines[pos] = new fabric.Path(path, {
         pos: pos,
         stroke: color,
         strokeWidth: size,
+        strokeLineJoin: 'round',
+        strokeLineCap: 'round',
         selectable: false
     });
     return lines[pos];
@@ -75,6 +76,38 @@ canvas.on('mouse:up', function(e) {
     canvas.off('mouse:move');
 });
 
+function change_cursor(){
+    var cursorSize = brushSize;
+    if (cursorSize < 10){
+        cursorSize = 10;
+    }
+    var cursorColor = brushColor;
+    var cursorGenerator = document.createElement("canvas");
+    cursorGenerator.width = cursorSize;
+    cursorGenerator.height = cursorSize;
+    var ctx = cursorGenerator.getContext("2d");
+
+    var centerX = cursorGenerator.width/2;
+    var centerY = cursorGenerator.height/2;
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, (cursorSize/2)-4, 0, 2 * Math.PI, false);
+    if (erasing){
+         ctx.fillStyle = 'white';
+         ctx.fill()
+    }
+
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = cursorColor;
+    ctx.stroke();
+
+    canvas.defaultCursor = "url(" + cursorGenerator.toDataURL("image/png") + ") " + cursorSize/2 + " " + cursorSize/2 + ",crosshair";
+
+
+}
+
+change_cursor();
+
 function draw_move(e) {
     var mouse = canvas.getPointer(e.e);
     if (!erasing) {
@@ -96,12 +129,29 @@ function draw_move(e) {
             fromY = Number(posList[1]);
             toX = Number(posList[2]);
             toY = Number(posList[3]);
+            if (((Math.abs(mouse.x-fromX) > 70) || ((Math.abs(mouse.x-toX)) > 70))) {
+                continue;
+            }
+            else if (((Math.abs(mouse.y-fromY) > 70) || ((Math.abs(mouse.y-toY)) > 70))) {
+                continue;
+            }
             slope = (toY-fromY)/(toX-fromX);
-            for (var x=fromX; x<=toX; x++) {
-                y = fromY + ((x-fromX)*slope);
-                if ((mouse.x-brushSize <= x <= mouse.x+brushSize) && (mouse.y-brushSize <= y <= mouse.y+brushSize)) {
-                    canvas.remove(lines[line]);
-                    delete lines[line];
+            if (fromX < toX) {
+                for (var x=fromX; x<=toX; x++) {
+                    y = fromY + ((x-fromX)*slope);
+                    if ((mouse.x-brushSize <= x <= mouse.x+brushSize+15) && (mouse.y-brushSize-15 <= y <= mouse.y+brushSize)) {
+                        canvas.remove(lines[line]);
+                        delete lines[line];
+                    }
+                }
+            }
+            else {
+                for (var x=fromX; x>=toX; x--) {
+                    y = fromY + ((x-fromX)*slope);
+                    if ((mouse.x-brushSize <= x <= mouse.x+brushSize+15) && (mouse.y-brushSize-15 <= y <= mouse.y+brushSize)) {
+                        canvas.remove(lines[line]);
+                        delete lines[line];
+                    }
                 }
             }
         }
@@ -113,7 +163,7 @@ function add_icon(icon, hash) {
     fabric.Image.fromURL(icon, function(img) {
         if (!hash) {
             hash = Math.random().toString(36);
-        }
+        }z
         var oImg = img.set({
             hash: hash,
             left: 100,
@@ -220,7 +270,7 @@ $('.eraserIcon').click(function(){
     else {
         erasing = true;
     }
-    console.log(erasing);
+    change_cursor();
 });
 
 
@@ -651,43 +701,43 @@ $(document).ready(function () {
     })
 
     // Draw Mouse
-    function ChangeMouse(){
-        var brushSize = context.lineWidth;
-        if (brushSize < 10){
-            brushSize = 10;
-        }
+        function ChangeMouse(){
+            var brushSize = context.lineWidth;
+            if (brushSize < 10){
+                brushSize = 10;
+            }
 
-        var brushColor = context.strokeStyle;
+            var brushColor = context.strokeStyle;
 
-        var eraser = false;
-        if (context.globalCompositeOperation == "destination-out"){
-            eraser = true;
-        }
+            var eraser = false;
+            if (context.globalCompositeOperation == "destination-out"){
+                eraser = true;
+            }
 
-        var cursorGenerator = document.createElement("canvas");
-        cursorGenerator.width = brushSize;
-        cursorGenerator.height = brushSize;
-        var ctx = cursorGenerator.getContext("2d");
+            var cursorGenerator = document.createElement("canvas");
+            cursorGenerator.width = brushSize;
+            cursorGenerator.height = brushSize;
+            var ctx = cursorGenerator.getContext("2d");
 
-        var centerX = cursorGenerator.width / 2;
-        var centerY = cursorGenerator.height / 2;
-        var radius = brushSize;
+            var centerX = cursorGenerator.width / 2;
+            var centerY = cursorGenerator.height / 2;
+            var radius = brushSize;
 
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, (brushSize/2)-4, 0, 2 * Math.PI, false);
-        if (eraser){
-             ctx.fillStyle = 'white';
-             ctx.fill()
-        }
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, (brushSize/2)-4, 0, 2 * Math.PI, false);
+            if (eraser){
+                 ctx.fillStyle = 'white';
+                 ctx.fill()
+            }
 
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = brushColor;
-        ctx.stroke();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = brushColor;
+            ctx.stroke();
 
-        $('#sketch').css( "cursor", "url(" + cursorGenerator.toDataURL("image/png") + ") " + brushSize/2 + " " + brushSize/2 + ",crosshair");
+            $('#sketch').css( "cursor", "url(" + cursorGenerator.toDataURL("image/png") + ") " + brushSize/2 + " " + brushSize/2 + ",crosshair");
 
 
-    };
+        };
     // Init mouse
     ChangeMouse();
 
